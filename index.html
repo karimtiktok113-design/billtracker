@@ -420,6 +420,9 @@ html[data-mode="light"] .sidebar {
 html, body {
   width: 100%;
   height: 100%;
+  height: 100vh;
+  height: var(--app-height, 100dvh);
+  min-height: -webkit-fill-available;
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.5;
@@ -474,8 +477,12 @@ svg {
    ========================================================================== */
 #app-root {
   display: flex;
+  width: 100%;
   width: 100vw;
+  height: 100%;
   height: 100vh;
+  height: var(--app-height, 100dvh);
+  min-height: -webkit-fill-available;
   position: relative;
   overflow: hidden;
 }
@@ -485,7 +492,10 @@ svg {
    ========================================================================== */
 .sidebar {
   width: var(--sidebar-w);
+  height: 100%;
   height: 100vh;
+  height: var(--app-height, 100dvh);
+  max-height: var(--app-height, 100dvh);
   background-color: var(--bg-sidebar);
   border-right: 1px solid var(--border);
   display: flex;
@@ -494,6 +504,7 @@ svg {
   z-index: 50;
   transition: width var(--transition-normal), transform var(--transition-normal);
   position: relative;
+  overflow: hidden;
 }
 .sidebar-header {
   height: var(--header-h);
@@ -571,9 +582,13 @@ svg {
 }
 
 .sidebar-nav-scroll {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
   padding: 12px 10px;
   display: flex;
   flex-direction: column;
@@ -686,8 +701,9 @@ svg {
 /* Sidebar Footer: About Developer (ALWAYS LAST ITEM) */
 .sidebar-footer {
   border-top: 1px solid var(--border);
-  padding: 10px;
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px)) 10px;
   flex-shrink: 0;
+  background-color: var(--bg-sidebar);
 }
 .about-dev-nav {
   display: flex;
@@ -726,10 +742,14 @@ svg {
    MAIN VIEWPORT & TOPBAR
    ========================================================================== */
 .main-wrapper {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  height: 100%;
   height: 100vh;
+  height: var(--app-height, 100dvh);
   overflow: hidden;
   background-color: var(--bg-body);
   position: relative;
@@ -912,10 +932,16 @@ svg {
    VIEW CONTAINER & PANELS
    ========================================================================== */
 .content-area {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
   padding: 24px;
+  padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
 }
@@ -2032,24 +2058,81 @@ textarea.form-control {
 @media (max-width: 1024px) {
   .charts-grid-2 { grid-template-columns: 1fr; }
   .charts-grid-3 { grid-template-columns: 1fr; }
+  .content-area {
+    padding: 16px;
+    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Tablets (769px - 1024px): Android Tablets, iPads */
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Keep sidebar visible in sleek collapsed icon mode so it's always accessible */
   .sidebar {
+    position: relative;
+    width: var(--sidebar-collapsed-w);
+    height: 100%;
+    height: var(--app-height, 100dvh);
+    max-height: var(--app-height, 100dvh);
+    transform: none;
+    transition: width var(--transition-normal), box-shadow var(--transition-normal);
+  }
+  .sidebar .brand-meta,
+  .sidebar .nav-group-title,
+  .sidebar .nav-item-text,
+  .sidebar .nav-badge {
+    display: none;
+  }
+  .sidebar .sidebar-header {
+    padding: 0 10px;
+    justify-content: center;
+  }
+  .sidebar .nav-item,
+  .sidebar .about-dev-nav {
+    justify-content: center;
+    padding: 10px 0;
+  }
+  /* When expanded on tablet via hamburger or toggle */
+  .sidebar.mobile-open,
+  .sidebar.expanded {
     position: fixed;
     top: 0;
     bottom: 0;
     left: 0;
-    transform: translateX(-100%);
+    width: var(--sidebar-w) !important;
+    height: 100%;
+    height: var(--app-height, 100dvh);
+    max-height: var(--app-height, 100dvh);
+    z-index: 60;
+    box-shadow: var(--shadow-xl);
+    transform: none !important;
   }
-  .sidebar.mobile-open {
-    transform: translateX(0);
+  .sidebar.mobile-open .brand-meta,
+  .sidebar.mobile-open .nav-group-title,
+  .sidebar.mobile-open .nav-item-text,
+  .sidebar.mobile-open .nav-badge,
+  .sidebar.expanded .brand-meta,
+  .sidebar.expanded .nav-group-title,
+  .sidebar.expanded .nav-item-text,
+  .sidebar.expanded .nav-badge {
+    display: flex !important;
   }
-  .sidebar-overlay.active {
-    display: block;
+  .sidebar.mobile-open .sidebar-header,
+  .sidebar.expanded .sidebar-header {
+    padding: 0 16px;
+    justify-content: space-between;
+  }
+  .sidebar.mobile-open .nav-item,
+  .sidebar.mobile-open .about-dev-nav,
+  .sidebar.expanded .nav-item,
+  .sidebar.expanded .about-dev-nav {
+    justify-content: flex-start;
+    padding: 8.5px 12px;
   }
   .mobile-menu-toggle {
     display: flex;
   }
-  .content-area {
-    padding: 16px;
+  .sidebar-overlay.active {
+    display: block;
   }
 }
 
@@ -2060,6 +2143,29 @@ textarea.form-control {
 }
 
 @media (max-width: 768px) {
+  /* Sidebar Mobile Drawer */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    height: var(--app-height, 100dvh);
+    max-height: var(--app-height, 100dvh);
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+    z-index: 60;
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.active {
+    display: block;
+  }
+  .mobile-menu-toggle {
+    display: flex;
+  }
+
   /* Mobile Bottom Navigation Visibility & Safe Area Clearance */
   .mobile-bottom-nav {
     display: flex;
@@ -6596,10 +6702,21 @@ textarea.form-control {
       // --- WORKFLOW ACTIONS, MODALS, CONTROLLERS & EXPORTS ---
       return {
         init() {
+          this.setupViewportHeight();
           Store.init();
           this.setupEventListeners();
           this.updateGlobalHeader();
           this.navigateTo('dashboard');
+        },
+
+        setupViewportHeight() {
+          const update = () => {
+            const h = window.innerHeight;
+            document.documentElement.style.setProperty('--app-height', `${h}px`);
+          };
+          window.addEventListener('resize', update);
+          window.addEventListener('orientationchange', () => setTimeout(update, 100));
+          update();
         },
 
         setupEventListeners() {
@@ -6657,15 +6774,20 @@ textarea.form-control {
             });
           }
 
-          // Sidebar Collapse Button (Desktop)
+          // Sidebar Collapse Button (Desktop & Tablet)
           const collapseBtn = document.getElementById('sidebar-toggle-btn');
           if (collapseBtn && sidebar) {
             collapseBtn.addEventListener('click', () => {
+              if (sidebar.classList.contains('mobile-open')) {
+                sidebar.classList.remove('mobile-open');
+                if (overlay) overlay.classList.remove('active');
+                return;
+              }
               sidebar.classList.toggle('collapsed');
               Store.state.settings.sidebarCollapsed = sidebar.classList.contains('collapsed');
               Store.save();
             });
-            if (Store.state.settings.sidebarCollapsed) {
+            if (Store.state.settings.sidebarCollapsed && window.innerWidth > 1024) {
               sidebar.classList.add('collapsed');
             }
           }
